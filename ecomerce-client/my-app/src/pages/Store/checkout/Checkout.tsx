@@ -24,7 +24,6 @@ export default function Checkout() {
     const orderID = searchParams.get("orderID");
 
 
-    
     const fetchClientSecret = useCallback(async () => {
         // Create a Checkout Session
 

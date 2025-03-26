@@ -18,6 +18,7 @@ import OrderPage from "@pages/Admin/orders/orderPage.tsx";
 import Checkout from "@pages/Store/checkout/Checkout.tsx";
 import PersonalInfo from "@pages/Store/checkout/PersonalInfo.tsx";
 import OrderConfirmation from "@pages/Store/checkout/Order-confirmation.tsx";
+import ErrorPage from "@pages/404.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -65,7 +66,8 @@ export const router = createBrowserRouter(
                     path: "order-confirmation",
                     element: <OrderConfirmation/>
                 }
-            ]
+            ],
+            errorElement: <ErrorPage/>
         },
 
         {
@@ -120,7 +122,9 @@ export const router = createBrowserRouter(
                     loader: () => AdminLoader({isLoginroute: false}),
 
                 }
-                ]
+                ],
+            errorElement: <ErrorPage/>
+
         }
     ]
 )
