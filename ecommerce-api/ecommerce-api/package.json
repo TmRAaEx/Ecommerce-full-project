@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx tsx watch src/index.ts",
-    "stripe-webhook": "C:stripe_1.25.0_windows_x86_64stripe.exe listen --forward-to localhost:3000/checkout/stripe-webhook --events checkout.session.completed"
+    "stripe-webhook": "C:stripe_1.25.0_windows_x86_64/stripe.exe listen --forward-to localhost:3000/checkout/stripe-webhook --events checkout.session.completed"
   },
   "author": "",
   "license": "ISC",
