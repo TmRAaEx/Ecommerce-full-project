@@ -1,0 +1,21 @@
+import IOrderItem from "@interfaces/IOrderItem.ts";
+
+export default interface IOrder {
+    id: number | null
+    customer_id: number
+    total_price: number
+    payment_status: "unpaid" | "paid" | "canceled"
+    payment_id: string
+    order_status: string
+    created_at: string
+    customer_firstname: string
+    customer_lastname: string
+    customer_email: string
+    customer_phone: string
+    customer_street_address: string
+    customer_postal_code: string
+    customer_city: string
+    customer_country: string
+    customers_created_at: string
+    order_items: IOrderItem[]
+}

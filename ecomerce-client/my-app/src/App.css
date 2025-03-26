@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+
+@theme{
+    --color-mainBG: #003571;
+    --color-accent: #000434;
+    --color-lightBG: #DFDFDF;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    background: var(--color-lightBG);
+}
+
+a {
+    display: flex;
+    align-items: center;
+}
+
+a.active > p {
+    text-decoration: underline;
+}
+
+main {
+    padding: 1rem .5rem 1rem .5rem;
+}
+
+
+button, select {
+    cursor: pointer;
+}
+
