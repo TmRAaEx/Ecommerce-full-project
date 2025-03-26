@@ -56,7 +56,7 @@ export const webHookEvents = async (req: Request, res: Response) => {
     case "checkout.session.completed":
       const session = event.data.object;
       const { id: payment_id, client_reference_id } = session;
-      console.log(client_reference_id);
+      
 
       try {
         await updateOrder(payment_id, Number(client_reference_id));

@@ -7,8 +7,8 @@ import {useCallback, useContext} from "react";
 import apiClient from "../../../services/requests.ts";
 import {CartContext} from "@context/CartContext.ts"
 import {IStripeData} from "@interfaces/IStripeData.ts";
-import {useSearchParams} from "react-router";
-
+import {useNavigate, useSearchParams} from "react-router";
+import {DangerButton} from "@ui/Buttons.tsx";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PK);
 
@@ -22,7 +22,31 @@ export default function Checkout() {
     const {cartItems} = useContext(CartContext);
     const [searchParams] = useSearchParams()
     const orderID = searchParams.get("orderID");
+    const navigate = useNavigate();
 
+
+    const handleCancel = async () => {
+        navigate("/products")
+    }
+
+
+    // useEffect(() => {
+    //     const deleteOrder = async () => {
+    //         try {
+    //             console.log("Unmounted");
+    //             await apiClient.delete(`orders/${orderID}`);
+    //             console.log("Order deleted");
+    //         } catch (error) {
+    //             console.error("Error deleting order:", error);
+    //         }
+    //     };
+    //
+    //     return () => {
+    //         deleteOrder();
+    //     };
+    // }, [orderID]);
+
+    //!WARNING: gets triggered by PAYING so it won´t work
 
     const fetchClientSecret = useCallback(async () => {
         // Create a Checkout Session
@@ -57,12 +81,16 @@ export default function Checkout() {
 
     return (
         <div id="checkout">
+
             <EmbeddedCheckoutProvider
                 stripe={stripePromise}
                 options={options}
             >
                 <EmbeddedCheckout/>
             </EmbeddedCheckoutProvider>
+            <div className={"max-w-[500px] mx-auto my-5"}>
+                <DangerButton onClick={handleCancel}>Cancel</DangerButton>
+            </div>
         </div>
     )
 }
