@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
-import { db } from "../config/db";
 import { ICustomer } from "../models/ICustomer";
 import { logError } from "../utilities/logger";
-import { ResultSetHeader } from "mysql2";
 
 import * as customerService from "../services/customerService";
 
@@ -81,7 +79,7 @@ export const deleteCustomer = async (req: Request, res: Response) => {
 
   try {
     const deletedRows = await customerService.deleteCustomer(Number(id));
-    
+
     deletedRows === 0
       ? res.status(404).json({ message: "Customer not found" })
       : res.json({ message: "Customer deleted" });
