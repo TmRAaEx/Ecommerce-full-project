@@ -51,19 +51,46 @@ export default function PersonalInfo() {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        let tempID = undefined
         if (validateForm()) {
-            const isCustomer = await apiClient.get<ICustomer[]>(`/customers/email/${formData.email}`);
-            if (!isCustomer || isCustomer.length === 0) {
-                const response = await apiClient.post<IPostResponse>("/customers", formData);
-                console.log(response)
-                setFormData({...formData, id: response.insertedID as number});
-                tempID = response.insertedID as number;
+            try {
+                let customer: ICustomer | null = null;
+                let tempID: number | null = null;
+
+                // Check if the customer exists
+                try {
+                    const isCustomer = await apiClient.get<ICustomer[]>(`/customers/email/${formData.email}`);
+                    if (isCustomer && isCustomer.length > 0) {
+                        customer = isCustomer[0];
+                    }
+                } catch (error: any) {
+                    if (error.status !== 404) {
+                        console.error("Error fetching customer:", error);
+                        throw error;
+                    }
+                }
+
+                // If customer doesn't exist, create one
+                if (!customer) {
+                    let tempID = undefined
+                    const response = await apiClient.post<IPostResponse>("/customers", formData);
+                    tempID = response.insertedID as number;
+                    customer = {...formData, id: tempID};
+                }
+
+                // Proceed with creating the order
+                const orderResponse = await createOrder(customer, cartItems);
+
+                // Store the customer in localStorage
+                localStorage.setItem("customer", JSON.stringify(customer));
+
+                // Navigate to checkout page
+                navigate(`/checkout?orderID=${orderResponse.id}`);
+            } catch (error) {
+                console.error("Error processing checkout:", error);
             }
-            const response = await createOrder((isCustomer[0] ? isCustomer[0] : formData), cartItems);
-            localStorage.setItem("customer", JSON.stringify((isCustomer ? isCustomer : {...formData, id: tempID})));
-            navigate(`/checkout?orderID=${response.id}`);
         }
+
+
     };
 
     return (
