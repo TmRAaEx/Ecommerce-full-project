@@ -62,7 +62,7 @@ export default function PersonalInfo() {
                         customer = isCustomer[0];
                     }
                 } catch (error: any) {
-                    if (error.status !== 404) {
+                    if (error.status !== 404) { //if error is anything except "Not Found" rethrow it
                         console.error("Error fetching customer:", error);
                         throw error;
                     }
@@ -70,10 +70,8 @@ export default function PersonalInfo() {
 
                 // If customer doesn't exist, create one
                 if (!customer) {
-                    let tempID = undefined
                     const response = await apiClient.post<IPostResponse>("/customers", formData);
-                    tempID = response.insertedID as number;
-                    customer = {...formData, id: tempID};
+                    customer = {...formData, id: response.insertedID as number};
                 }
 
                 // Proceed with creating the order
@@ -88,8 +86,6 @@ export default function PersonalInfo() {
                 console.error("Error processing checkout:", error);
             }
         }
-
-
     };
 
     return (

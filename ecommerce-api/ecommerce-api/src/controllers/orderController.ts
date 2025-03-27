@@ -1,12 +1,8 @@
-import { json, Request, Response } from "express";
-import { db } from "../config/db";
-import { IOrderItem } from "../models/IOrderItem";
+import { Request, Response } from "express";
 import { IOrder } from "../models/IOrder";
 import { logError } from "../utilities/logger";
-import { ResultSetHeader } from "mysql2";
 
 import * as orderService from "../services/orderService";
-import { formatOrderDetails } from "../utilities/dataHandler";
 
 export const getOrders = async (_: any, res: Response) => {
   try {
