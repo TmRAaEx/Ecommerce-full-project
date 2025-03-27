@@ -1,6 +1,7 @@
 import { ResultSetHeader } from "mysql2";
 import { IOrderItem } from "../models/IOrderItem";
 import { db } from "../config/db";
+import { IOrder } from "../models/IOrder";
 
 const updateOrderItem = async (
   id: IOrderItem["id"],
@@ -44,7 +45,16 @@ const deleteOrderItem = async (id: IOrderItem["id"]): Promise<boolean> => {
   }
 };
 
-export { updateOrderItem, deleteOrderItem };
+const getOrderItems = async (orderID: IOrder["id"]) => {
+  const getOrderItems = `SELECT * FROM order_items WHERE order_id = ?`;
+
+  const [rows] = await db.query<IOrderItem[]>(getOrderItems, [orderID]);
+
+  return rows;
+};
+
+
+export { updateOrderItem, deleteOrderItem, getOrderItems };
 
 const updateOrderTotalPrice = async (order_id: number) => {
   try {

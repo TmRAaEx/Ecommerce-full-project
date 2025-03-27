@@ -57,9 +57,9 @@ export default function PersonalInfo() {
 
                 // Check if the customer exists
                 try {
-                    const isCustomer = await apiClient.get<ICustomer[]>(`/customers/email/${formData.email}`);
-                    if (isCustomer && isCustomer.length > 0) {
-                        customer = isCustomer[0];
+                    const isCustomer = await apiClient.get<ICustomer>(`/customers/email/${formData.email}`);
+                    if (isCustomer) {
+                        customer = isCustomer;
                     }
                 } catch (error: any) {
                     if (error.status !== 404) { //if error is anything except "Not Found" rethrow it
