@@ -36,7 +36,7 @@ export default function OrderPage() {
     const handleSubmit = async () => {
         if (orderData) {
             await updateOrder(orderData);
-            navigate("/admin/orders");
+            navigate("/admin/manage-orders");
         }
     };
 

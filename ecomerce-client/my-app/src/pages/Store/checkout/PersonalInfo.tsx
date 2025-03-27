@@ -54,7 +54,6 @@ export default function PersonalInfo() {
         if (validateForm()) {
             try {
                 let customer: ICustomer | null = null;
-                let tempID: number | null = null;
 
                 // Check if the customer exists
                 try {

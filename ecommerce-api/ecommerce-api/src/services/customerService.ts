@@ -44,11 +44,8 @@ const createCustomer = async (
 ): Promise<ICustomer["id"]> => {
   const customerData = Object.values(customer);
   customerData.shift(); //removes id
-  console.log(customerData);
 
   try {
-    console.log(customerData);
-
     const sql = `
       INSERT INTO customers (firstname, lastname, email, phone, street_address, postal_code, city, country)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
