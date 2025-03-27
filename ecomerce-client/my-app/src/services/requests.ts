@@ -1,5 +1,17 @@
 import axios, {AxiosInstance, AxiosResponse} from "axios";
 
+
+class ApiError extends Error {
+    status: number;
+
+    constructor(message: string, status: number) {
+        super(message);
+        this.status = status;
+        Object.setPrototypeOf(this, ApiError.prototype); // Ensure the prototype chain is correct
+    }
+}
+
+
 export class Request {
     private api: AxiosInstance;
 
@@ -44,9 +56,13 @@ export class Request {
             const response = await request();
             return response.data;
         } catch (error: any) {
-            throw new Error(error.response?.data?.error || "API request failed");
+            const message = error.response?.data?.message || "An unknown error occurred";
+            const status = error.response?.status || 500;
+
+            throw new ApiError(message, status);
         }
     }
+
 }
 
 const apiClient = new Request(import.meta.env.VITE_API_BASE);

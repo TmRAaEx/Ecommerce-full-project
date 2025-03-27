@@ -41,7 +41,6 @@ export const useOrders = () => {
 
     const createOrder = async (customer: ICustomer, cartItems: ICartItem[]) => {
         setLoading(true);
-        console.log("customer", customer)
         try {
             const orderItems: Partial<IOrderItem>[] = cartItems.map(item => ({
                 product_id: item.id as number,
@@ -61,8 +60,11 @@ export const useOrders = () => {
             };
 
 
+
+
+            //create order
             const response = await apiClient.post<IPostResponse>("/orders", orderData);
-            console.log(response)
+            // fetch full order data
             const fullOrder = await getOrderById(response.insertedID as IOrder["id"]);
 
             setOrders(prevState => [...prevState, fullOrder]);

@@ -3,12 +3,16 @@ import apiClient from "../services/requests.ts";
 
 export const updateOrderItem = async (id: IOrderItem["id"], newQuantity: IOrderItem["quantity"]) => {
     try {
-        await apiClient.patch(`/order-items/${id}`, {quantity: newQuantity})
+        if (newQuantity <= 0) {
+            await deleteOrderItem(id);
+        } else {
+            await apiClient.patch(`/order-items/${id}`, {quantity: newQuantity});
+        }
     } catch (err) {
         console.error(err);
         throw err;
     }
-}
+};
 
 export const deleteOrderItem = async (id: IOrderItem["id"]) => {
     try {

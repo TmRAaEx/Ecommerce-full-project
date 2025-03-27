@@ -5,7 +5,7 @@ export interface IOrder extends RowDataPacket {
   id: number | null;
   customer_id: number;
   total_price: number;
-  payment_status: "unpaid" | "payed" | "canceled";
+  payment_status: "unpaid" | "paid" | "canceled";
   payment_id: string;
   order_status: string;
   created_at: string;

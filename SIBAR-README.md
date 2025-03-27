@@ -3,6 +3,7 @@
 ## ✅ Lagt till lösenordsskyddade admins i databasen  
 ## ✅ Lagt till routes för hantering av admins  
 ## ✅ Ändrat så att `insert_id` skickas med vid skapande av relevanta entiteter  
+## ✅ Refacturerat controllers till controllers och services
 
 📄 **För översikt av databasförändringar, se `ecommerce-api/ER-diagram.pdf`**  
 

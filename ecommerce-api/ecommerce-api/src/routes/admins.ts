@@ -1,4 +1,4 @@
-import { Router } from "express";
+import express from "express";
 
 import {
   createAdmin,
@@ -6,7 +6,7 @@ import {
   loginAdmin,
 } from "../controllers/adminController";
 
-const router = Router();
+const router = express.Router();
 
 router.get("/", getAdmins);
 router.post("/register", createAdmin);
