@@ -1,14 +1,13 @@
 import { Request, Response } from "express";
-import { db } from "../config/db";
 import { IProduct } from "../models/IProduct";
 import { logError } from "../utilities/logger";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
+
+import * as productService from "../services/productService";
 
 export const getProducts = async (_: any, res: Response) => {
   try {
-    const sql = "SELECT * FROM products";
-    const [rows] = await db.query<IProduct[]>(sql);
-    res.json(rows);
+    const products = await productService.getProducts();
+    res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ error: logError(error) });
   }
@@ -18,11 +17,11 @@ export const getProductById = async (req: Request, res: Response) => {
   const id: string = req.params.id;
 
   try {
-    const sql = "SELECT * FROM products WHERE id = ?";
-    const [rows] = await db.query<IProduct[]>(sql, [id]);
+    const product = await productService.getProductById(Number(id));
+    console.log(product);
 
-    rows && rows.length > 0
-      ? res.json(rows[0])
+    product
+      ? res.status(200).json(product)
       : res.status(404).json({ message: "Product not found" });
   } catch (error) {
     res.status(500).json({ error: logError(error) });
@@ -34,17 +33,19 @@ export const createProduct = async (req: Request, res: Response) => {
     req.body;
 
   try {
-    const sql = `
-      INSERT INTO products (name, description, price,regular_price, stock, category, image) 
-      VALUES (?, ?, ?,?, ?, ?, ?)
-    `;
-    const params = [name, description, price, price, stock, category, image];
-    const [ResultSetHeader] = await db.query<ResultSetHeader>(sql, params);
+    const insertedProductID = await productService.createProduct(
+      name,
+      description,
+      price,
+      stock,
+      category,
+      image
+    );
     res.status(201).json({
       message: "Product created",
-      insertedID: ResultSetHeader.insertId,
+      insertedID: insertedProductID,
     });
-  } catch (error: unknown) {
+  } catch (error) {
     res.status(500).json({ error: logError(error) });
   }
 };
@@ -62,12 +63,7 @@ export const updateProduct = async (req: Request, res: Response) => {
   }: IProduct = req.body;
 
   try {
-    const sql = `
-      UPDATE products 
-      SET name = ?, description = ?, price = ?, regular_price = ?, stock = ?, category = ?, image = ? 
-      WHERE id = ?
-    `;
-    const params = [
+    const updatedProduct = await productService.updateProduct(
       name,
       description,
       price,
@@ -75,13 +71,12 @@ export const updateProduct = async (req: Request, res: Response) => {
       stock,
       category,
       image,
-      id,
-    ];
-    const [result] = await db.query<ResultSetHeader>(sql, params);
+      id
+    );
 
-    result.affectedRows === 0
-      ? res.status(404).json({ message: "Product not found" })
-      : res.json({ message: "Product updated" });
+    updatedProduct
+      ? res.status(204)
+      : res.status(404).json({ message: "Product not found" });
   } catch (error) {
     res.status(500).json({ error: logError(error) });
   }
@@ -91,12 +86,10 @@ export const deleteProduct = async (req: Request, res: Response) => {
   const id = req.params.id;
 
   try {
-    const sql = "DELETE FROM products WHERE id = ?";
-    const [result] = await db.query<ResultSetHeader>(sql, [id]);
-
-    result.affectedRows === 0
-      ? res.status(404).json({ message: "Product not found" })
-      : res.json({ message: "Product deleted" });
+    const deletedProduct = await productService.deleteProduct(Number(id));
+    deletedProduct
+      ? res.status(204)
+      : res.status(404).json({ message: "Product not found" });
   } catch (error) {
     res.status(500).json({ error: logError(error) });
   }

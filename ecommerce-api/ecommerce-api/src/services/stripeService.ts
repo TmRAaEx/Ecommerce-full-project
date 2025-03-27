@@ -41,7 +41,7 @@ const webHookEvents = async (event: any) => {
 
         console.log("Order updated succefully!");
 
-        await updateProductStock(payment_id);
+        await updateProductStockOnCheckout(payment_id);
         console.log("Item stock updated succefully");
       } catch (err) {
         throw err;
@@ -57,7 +57,7 @@ const webHookEvents = async (event: any) => {
 
 export { createCheckoutSession, webHookEvents };
 
-const updateProductStock = async (payment_id: string) => {
+const updateProductStockOnCheckout = async (payment_id: string) => {
   const getOrderData = `SELECT id FROM orders WHERE payment_id = ?`;
 
   const [rows] = await db.query<IOrder[]>(getOrderData, [payment_id]);

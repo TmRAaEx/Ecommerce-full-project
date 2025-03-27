@@ -39,7 +39,7 @@ export const webHookEvents = async (req: Request, res: Response) => {
   const endpointSecret = process.env.STRIPE_ENDPOINT_SECRET;
 
   let event;
-
+  
   try {
     event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret);
   } catch (err) {
