@@ -23,7 +23,12 @@ export const createAdmin = async (req: Request, res: Response) => {
 
   const apiKey = req.headers["x-api-key"];
 
+  console.log(apiKey);
+  
+
   if (!apiKey || apiKey !== admin_api_key) {
+    console.log("womp womp");
+    
     res.status(403).json({ error: "Forbidden: Invalid API Key" });
     return;
   }

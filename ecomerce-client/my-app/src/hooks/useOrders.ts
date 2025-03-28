@@ -22,11 +22,27 @@ export const useOrders = () => {
 
 
     useEffect(() => {
+        getOrders(false)
+    }, []);
+
+
+    const refreshOrders = async () => {
+        console.log("refreshing orders");
+        localStorage.setItem("orders", "");
+        setOrders([])
+
+        getOrders(true)
+    }
+
+
+    //speed solution of refresh:boolean tp be able to refreag
+
+    const getOrders = (refresh: boolean) => {
         setLoading(true);
 
         apiClient.get<IOrder[]>("/orders")
             .then((data) =>
-                Promise.all(data.map((order: IOrder) => getOrderById(order.id as IOrder["id"])))
+                Promise.all(data.map((order: IOrder) => getOrderById(order.id as IOrder["id"], refresh)))
             )
             .then((allOrders) => {
                 setOrders(allOrders);
@@ -36,7 +52,7 @@ export const useOrders = () => {
                 setError(errorChecker(error));
             })
             .finally(() => setLoading(false));
-    }, []);
+    }
 
 
     const createOrder = async (customer: ICustomer, cartItems: ICartItem[]) => {
@@ -89,9 +105,10 @@ export const useOrders = () => {
         }
     };
 
-    const getOrderById = async (id: IOrder["id"]) => {
+    const getOrderById = async (id: IOrder["id"], refresh: boolean = false) => {
+
         const orderInList = orders.find((order) => order.id === id);
-        if (orderInList) return orderInList;
+        if (orderInList && !refresh) return orderInList;
         try {
             return await apiClient.get<IOrder>(`/orders/${id}`);
         } catch (error) {
@@ -161,6 +178,7 @@ export const useOrders = () => {
         getOrderById,
         createOrder,
         getOrderByPaymentID,
-        getOrdersByCustomerId
+        getOrdersByCustomerId,
+        refreshOrders
     };
 };

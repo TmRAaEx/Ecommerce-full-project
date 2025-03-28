@@ -3,7 +3,6 @@ import { db } from "../config/db";
 import { IOrder } from "../models/IOrder";
 import { IOrderItem } from "../models/IOrderItem";
 import { formatOrderDetails } from "../utilities/dataHandler";
-import { getOrdersByCustomerId } from "../controllers/orderController";
 import { ICustomer } from "../models/ICustomer";
 
 const getOrders = async (): Promise<IOrder[]> => {
@@ -142,6 +141,8 @@ const updateOrder = async (
     const params = [payment_status, payment_id, order_status, id];
     const [result] = await db.query<ResultSetHeader>(sql, params);
 
+    
+
     return result.affectedRows > 0;
   } catch (error) {
     throw error;
@@ -174,9 +175,7 @@ const getOrdersByCustomerId = async (customer_id: ICustomer["id"]) => {
     const [rows] = await db.query<IOrder[]>(sql, [customer_id]);
 
     console.log(rows);
-    
 
-    
     return rows && rows.length > 0
       ? formatOrderDetails(customer_id, rows)
       : false;
