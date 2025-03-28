@@ -1,6 +1,7 @@
 import { db } from "../config/db";
 import { ICustomer } from "../models/ICustomer";
 import { ResultSetHeader } from "mysql2";
+import bcrypt from "bcrypt";
 
 const getCustomers = async (): Promise<ICustomer[]> => {
   try {
@@ -43,7 +44,7 @@ const createCustomer = async (
   customer: ICustomer
 ): Promise<ICustomer["id"]> => {
   const customerData = Object.values(customer);
-  customerData.shift(); //removes id
+  customerData.shift(); //removes id that is null
 
   try {
     const sql = `
@@ -91,6 +92,54 @@ const deleteCustomer = async (id: ICustomer["id"]): Promise<number> => {
   }
 };
 
+const auth_customer = async (
+  email: ICustomer["email"],
+  password: ICustomer["password"]
+): Promise<ICustomer | false> => {
+  try {
+    const customer = await getCustomerByEmail(email);
+    if (!customer) return false;
+
+    const isValidPass = await bcrypt.compare(
+      password as string,
+      customer.password as string
+    );
+    return isValidPass ? customer : false;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const register_customer = async (
+  customer: ICustomer
+): Promise<ICustomer["id"]> => {
+  if (!customer || !customer.password) {
+    throw new Error("Invalid or incomplete data");
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(customer.password, 10);
+
+    const customerData = Object.values({
+      ...customer,
+      password: hashedPassword,
+    });
+
+    console.log("customerData:", customerData);
+
+    const sql = `
+      INSERT INTO customers (firstname, lastname, email, password, phone, street_address, postal_code, city, country)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await db.query<ResultSetHeader>(sql, customerData);
+
+    return result.insertId;
+  } catch (error) {
+    console.error("Error registering customer:", error);
+    throw new Error("Error registering customer. Please try again later.");
+  }
+};
+
 export {
   getCustomers,
   getCustomerById,
@@ -98,4 +147,6 @@ export {
   createCustomer,
   updateCustomer,
   deleteCustomer,
+  auth_customer,
+  register_customer,
 };

@@ -3,6 +3,7 @@ import { ICustomer } from "../models/ICustomer";
 import { logError } from "../utilities/logger";
 
 import * as customerService from "../services/customerService";
+import { generateCustomerToken } from "../utilities/jwtFunctions";
 
 export const getCustomers = async (_: any, res: Response) => {
   try {
@@ -55,8 +56,6 @@ export const createCustomer = async (req: Request, res: Response) => {
       insertedID: createdCustomerID,
     });
   } catch (error) {
-    console.log(error);
-
     res.status(500).json({ error: logError(error) });
   }
 };
@@ -83,6 +82,47 @@ export const deleteCustomer = async (req: Request, res: Response) => {
     deletedRows === 0
       ? res.status(404).json({ message: "Customer not found" })
       : res.json({ message: "Customer deleted" });
+  } catch (error) {
+    res.status(500).json({ error: logError(error) });
+  }
+};
+
+export const loginCustomer = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  try {
+    const customerLoggedIn = await customerService.auth_customer(
+      email,
+      password
+    );
+
+    if (!customerLoggedIn) {
+      res.status(401).json({ message: "Incorrect credentials" });
+      return;
+    }
+
+    const { id, name, email: customerEmail } = customerLoggedIn;
+
+    const token = generateCustomerToken({ id, email: customerEmail });
+
+    res
+      .status(200)
+      .json({ customer: { id, name, email: customerEmail }, token });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const registerCustomer = async (req: Request, res: Response) => {
+  const customer = req.body;
+
+  try {
+    const createdCustomerID = await customerService.register_customer(customer);
+    res.status(201).json({
+      message: "Customer created",
+      insertedID: createdCustomerID,
+    });
   } catch (error) {
     res.status(500).json({ error: logError(error) });
   }
