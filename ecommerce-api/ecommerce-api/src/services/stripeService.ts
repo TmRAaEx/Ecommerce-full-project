@@ -36,7 +36,7 @@ const webHookEvents = async (event: any) => {
           Number(client_reference_id), //order id
           "paid", // payment status
           payment_id, // payment id
-          "received" // oreder status
+          "received" // order status
         );
 
         console.log("Order updated succefully!");
