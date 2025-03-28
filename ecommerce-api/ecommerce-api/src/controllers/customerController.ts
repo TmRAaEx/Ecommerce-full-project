@@ -55,7 +55,6 @@ export const createCustomer = async (req: Request, res: Response) => {
       insertedID: createdCustomerID,
     });
   } catch (error) {
-    console.log(error);
 
     res.status(500).json({ error: logError(error) });
   }
@@ -83,6 +82,20 @@ export const deleteCustomer = async (req: Request, res: Response) => {
     deletedRows === 0
       ? res.status(404).json({ message: "Customer not found" })
       : res.json({ message: "Customer deleted" });
+  } catch (error) {
+    res.status(500).json({ error: logError(error) });
+  }
+};
+
+export const loginCustomer = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  try {
+    const loggedIn = await customerService.auth_customer(email, password);
+
+    loggedIn
+      ? res.status(200).json({ customer: loggedIn })
+      : res.status(401).json({ message: "Incorrect credentials" });
   } catch (error) {
     res.status(500).json({ error: logError(error) });
   }

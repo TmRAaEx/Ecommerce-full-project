@@ -1,6 +1,7 @@
 import { db } from "../config/db";
 import { ICustomer } from "../models/ICustomer";
 import { ResultSetHeader } from "mysql2";
+import bcrypt from "bcrypt";
 
 const getCustomers = async (): Promise<ICustomer[]> => {
   try {
@@ -43,7 +44,7 @@ const createCustomer = async (
   customer: ICustomer
 ): Promise<ICustomer["id"]> => {
   const customerData = Object.values(customer);
-  customerData.shift(); //removes id
+  customerData.shift(); //removes id that is null
 
   try {
     const sql = `
@@ -91,6 +92,24 @@ const deleteCustomer = async (id: ICustomer["id"]): Promise<number> => {
   }
 };
 
+const auth_customer = async (
+  email: ICustomer["email"],
+  password: ICustomer["password"]
+): Promise<ICustomer | boolean> => {
+  try {
+    const customer = await getCustomerByEmail(email);
+    if (!customer) return false;
+
+    const isValidPass = await bcrypt.compare(
+      password as string,
+      customer.password as string
+    );
+    return isValidPass ? customer : false;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export {
   getCustomers,
   getCustomerById,
@@ -98,4 +117,5 @@ export {
   createCustomer,
   updateCustomer,
   deleteCustomer,
+  auth_customer,
 };
