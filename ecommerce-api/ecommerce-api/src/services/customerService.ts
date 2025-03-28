@@ -95,7 +95,7 @@ const deleteCustomer = async (id: ICustomer["id"]): Promise<number> => {
 const auth_customer = async (
   email: ICustomer["email"],
   password: ICustomer["password"]
-): Promise<ICustomer | boolean> => {
+): Promise<ICustomer | false> => {
   try {
     const customer = await getCustomerByEmail(email);
     if (!customer) return false;
@@ -110,6 +110,36 @@ const auth_customer = async (
   }
 };
 
+const register_customer = async (
+  customer: ICustomer
+): Promise<ICustomer["id"]> => {
+  if (!customer || !customer.password) {
+    throw new Error("Invalid or incomplete data");
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(customer.password, 10);
+
+    const customerData = Object.values({
+      ...customer,
+      password: hashedPassword,
+    });
+
+    console.log("customerData:", customerData);
+
+    const sql = `
+      INSERT INTO customers (firstname, lastname, email, password, phone, street_address, postal_code, city, country)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const [result] = await db.query<ResultSetHeader>(sql, customerData);
+
+    return result.insertId;
+  } catch (error) {
+    console.error("Error registering customer:", error);
+    throw new Error("Error registering customer. Please try again later.");
+  }
+};
+
 export {
   getCustomers,
   getCustomerById,
@@ -118,4 +148,5 @@ export {
   updateCustomer,
   deleteCustomer,
   auth_customer,
+  register_customer,
 };

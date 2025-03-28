@@ -6,7 +6,9 @@ import {
   updateOrder,
   deleteOrder,
   getOrderByPaymentID,
+  getOrdersByCustomerId,
 } from "../controllers/orderController";
+import { authenticateUser } from "../middlewares/authUserMiddleware";
 const router = express.Router();
 
 router.get("/", getOrders);
@@ -15,5 +17,6 @@ router.get("/paymentID/:payment_id", getOrderByPaymentID);
 router.post("/", createOrder);
 router.patch("/:id", updateOrder);
 router.delete("/:id", deleteOrder);
+router.get("/customerID/:customer_id", authenticateUser, getOrdersByCustomerId);
 
 export default router;

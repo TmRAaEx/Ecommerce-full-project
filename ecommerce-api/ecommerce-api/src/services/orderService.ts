@@ -3,6 +3,8 @@ import { db } from "../config/db";
 import { IOrder } from "../models/IOrder";
 import { IOrderItem } from "../models/IOrderItem";
 import { formatOrderDetails } from "../utilities/dataHandler";
+import { getOrdersByCustomerId } from "../controllers/orderController";
+import { ICustomer } from "../models/ICustomer";
 
 const getOrders = async (): Promise<IOrder[]> => {
   try {
@@ -157,6 +159,32 @@ const deleteOrder = async (id: IOrder["id"]): Promise<boolean> => {
   }
 };
 
+const getOrdersByCustomerId = async (customer_id: ICustomer["id"]) => {
+  try {
+    const sql = `
+          SELECT 
+            *, 
+            orders.created_at AS orders_created_at, 
+            customers.created_at AS customers_created_at 
+          FROM orders 
+          LEFT JOIN customers ON orders.customer_id = customers.id
+          LEFT JOIN order_items ON orders.id = order_items.order_id
+          WHERE orders.customer_id = ?
+        `;
+    const [rows] = await db.query<IOrder[]>(sql, [customer_id]);
+
+    console.log(rows);
+    
+
+    
+    return rows && rows.length > 0
+      ? formatOrderDetails(customer_id, rows)
+      : false;
+  } catch (error) {
+    throw error;
+  }
+};
+
 const createOrderItem = async (data: IOrderItem) => {
   const {
     order_id,
@@ -198,4 +226,5 @@ export {
   createOrder,
   updateOrder,
   deleteOrder,
+  getOrdersByCustomerId,
 };

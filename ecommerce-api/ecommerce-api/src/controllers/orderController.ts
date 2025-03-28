@@ -95,3 +95,17 @@ export const deleteOrder = async (req: Request, res: Response) => {
     res.status(500).json({ error: logError(error) });
   }
 };
+
+export const getOrdersByCustomerId = async (req: Request, res: Response) => {
+  const customer_id: string = req.params.customer_id;
+
+  try {
+    const order = await orderService.getOrdersByCustomerId(Number(customer_id));
+
+    order
+      ? res.status(200).json(order)
+      : res.status(404).json({ message: "Order not found" });
+  } catch (error) {
+    res.status(500).json({ error: logError(error) });
+  }
+};
