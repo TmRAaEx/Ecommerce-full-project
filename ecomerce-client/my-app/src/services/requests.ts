@@ -31,8 +31,12 @@ export class Request {
     }
 
     setApiKey(newApiKey: string) {
-        console.log(newApiKey);
+
         this.api.defaults.headers["x-api-key"] = newApiKey;
+    }
+
+    setCustomerToken(newCustomerToken: string) {
+        this.api.defaults.headers["Authorization"] = `Bearer ${newCustomerToken}`;
     }
 
     async get<T>(url: string, params: object = {}): Promise<T> {

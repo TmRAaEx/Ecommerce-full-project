@@ -2,9 +2,11 @@ import {NavLink} from "react-router";
 import CartIcon from "@ui/CartIcon.tsx";
 import {useContext} from "react";
 import {CartContext} from "@context/CartContext.ts";
+import Cookies from "js-cookie";
 
 export default function ShopHeader() {
 
+    const customer = Cookies.get("customer");
     const {getCartTotalItems} = useContext(CartContext);
     return (
         <div className={"w-full bg-mainBG h-25 flex flex-col justify-between"}>
@@ -12,6 +14,17 @@ export default function ShopHeader() {
             <nav className={"bg-accent w-full flex-grow flex justify-evenly align-center"}>
                 <NavLink to={"/products"}><p className={"text-white text-lg"}>Products</p></NavLink>
                 <NavLink to={"/categories"}><p className={"text-white text-lg"}>Categories</p></NavLink>
+
+                {customer ?
+                    <NavLink to={"/my-orders"}>
+                        <p className={"text-white lg"}>My orders</p>
+                    </NavLink>
+                    :
+                    <NavLink to={"/login"}>
+                        <p className={"text-white lg"}>Login</p>
+                    </NavLink>
+                }
+
                 <NavLink to={"/cart"}>
                     <p className="text-white text-lg flex flex-row items-center gap-1 relative">
                         Cart
@@ -27,6 +40,8 @@ export default function ShopHeader() {
                             </span>
                     </p>
                 </NavLink>
+
+
             </nav>
         </div>
     )

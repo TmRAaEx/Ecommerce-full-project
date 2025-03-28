@@ -1,5 +1,5 @@
 import {ICustomer} from "@interfaces/ICustomer.ts";
-import {ChangeEvent, FormEvent, useState} from "react";
+import {ChangeEvent, FormEvent, useState, useEffect} from "react";
 import apiClient from "../../../services/requests.ts";
 import {IPostResponse} from "@interfaces/IPostResponse.ts";
 import {useNavigate} from "react-router";
@@ -7,6 +7,7 @@ import {SubmitButton} from "@ui/Buttons.tsx";
 import {useOrders} from "@hooks/useOrders.ts";
 import {useContext} from "react";
 import {CartContext} from "@context/CartContext.ts";
+import Cookies from "js-cookie";
 
 export default function PersonalInfo() {
     const [formData, setFormData] = useState<ICustomer>({
@@ -27,12 +28,34 @@ export default function PersonalInfo() {
 
     const {createOrder, loading, error} = useOrders();
 
+    const navigate = useNavigate();
+
+    // Use effect to auto-fill customer info from cookie (if exists)
+    useEffect(() => {
+        const customerCookie = Cookies.get("customer");
+        if (customerCookie) {
+            const {customer} = JSON.parse(customerCookie);
+            const {email, id} = customer
+            if (email && id) {
+                // Fetch customer details from backend using email
+                const getData = async () => {
+                    try {
+                        const customer = await apiClient.get<ICustomer>(`/customers/${id}`);
+                        if (customer) {
+                            setFormData(customer);
+                        }
+                    } catch (error) {
+                        console.error("Error fetching customer data", error);
+                    }
+                };
+                getData();
+            }
+        }
+    }, []);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setFormData({...formData, [e.target.name]: e.target.value});
     };
-
-    const navigate = useNavigate()
 
     const validateForm = () => {
         const newErrors: Partial<ICustomer> = {};
@@ -55,20 +78,20 @@ export default function PersonalInfo() {
             try {
                 let customer: ICustomer | null = null;
 
-                // Check if the customer exists
+                // Check if the customer exists in the system by email
                 try {
                     const isCustomer = await apiClient.get<ICustomer>(`/customers/email/${formData.email}`);
                     if (isCustomer) {
                         customer = isCustomer;
                     }
                 } catch (error: any) {
-                    if (error.status !== 404) { //if error is anything except "Not Found" rethrow it
+                    if (error.status !== 404) {
                         console.error("Error fetching customer:", error);
                         throw error;
                     }
                 }
 
-                // If customer doesn't exist, create one
+                // If the customer doesn't exist, create one
                 if (!customer) {
                     const response = await apiClient.post<IPostResponse>("/customers", formData);
                     customer = {...formData, id: response.insertedID as number};
@@ -77,10 +100,10 @@ export default function PersonalInfo() {
                 // Proceed with creating the order
                 const orderResponse = await createOrder(customer, cartItems);
 
-                // Store the customer in localStorage
+                // Store the customer in localStorage and cookie
                 localStorage.setItem("customer", JSON.stringify(customer));
 
-                // Navigate to checkout page
+                // Navigate to the checkout page
                 navigate(`/checkout?orderID=${orderResponse.id}`);
             } catch (error) {
                 console.error("Error processing checkout:", error);
@@ -117,9 +140,11 @@ export default function PersonalInfo() {
                     </div>
                 ))}
 
-                {error ? <>Error creating order! Try again later</> : null}
+                {error ? <div className="text-red-500">Error creating order! Try again later</div> : null}
 
-                <SubmitButton onClick={handleSubmit} loading={loading}>Continue to payment</SubmitButton>
+                <SubmitButton onClick={handleSubmit} loading={loading}>
+                    Continue to payment
+                </SubmitButton>
             </form>
         </div>
     );

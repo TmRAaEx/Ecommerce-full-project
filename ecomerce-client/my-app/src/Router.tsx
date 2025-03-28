@@ -19,6 +19,9 @@ import Checkout from "@pages/Store/checkout/Checkout.tsx";
 import PersonalInfo from "@pages/Store/checkout/PersonalInfo.tsx";
 import OrderConfirmation from "@pages/Store/checkout/Order-confirmation.tsx";
 import ErrorPage from "@pages/404.tsx";
+import LoginPage from "@pages/Store/LoginPage.tsx";
+import MyOrders from "@pages/Store/MyOrders.tsx";
+import RegisterPage from "@pages/Store/RegisterPage.tsx";
 
 export const router = createBrowserRouter(
     [
@@ -65,6 +68,17 @@ export const router = createBrowserRouter(
                 {
                     path: "order-confirmation",
                     element: <OrderConfirmation/>
+                },
+                {
+                    path: "login",
+                    element: <LoginPage/>
+                }, {
+                    path: "signup",
+                    element: <RegisterPage/>
+                },
+                {
+                    path: "my-orders",
+                    element: <MyOrders/>
                 }
             ],
             errorElement: <ErrorPage/>

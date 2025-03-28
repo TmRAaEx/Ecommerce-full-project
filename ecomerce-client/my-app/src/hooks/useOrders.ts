@@ -60,8 +60,6 @@ export const useOrders = () => {
             };
 
 
-
-
             //create order
             const response = await apiClient.post<IPostResponse>("/orders", orderData);
             // fetch full order data
@@ -133,11 +131,36 @@ export const useOrders = () => {
         }
     }
 
+    const getOrdersByCustomerId = async (id: ICustomer["id"], token: string) => {
+        const matchingOrders = orders.filter((order) => order.customer_id === id);
+        if (matchingOrders.length > 0) {
+            return matchingOrders; // Returns all matching orders
+        }
+        try {
+            apiClient.setCustomerToken(token)
+            return await apiClient.get<IOrder[]>(`/orders/customerID/${id}`);
+        } catch (error) {
+            console.error(error);
+            setError((errorChecker(error)));
+            throw error; // Re-throw the error to be caught by the outer promise chain
+        }
+    }
+
     const rollback = (oldOrders: IOrder[]) => {
         setOrders(oldOrders);
         localStorage.setItem("orders", JSON.stringify(oldOrders));
     }
 
 
-    return {orders, error, loading, deleteOrder, updateOrder, getOrderById, createOrder, getOrderByPaymentID};
+    return {
+        orders,
+        error,
+        loading,
+        deleteOrder,
+        updateOrder,
+        getOrderById,
+        createOrder,
+        getOrderByPaymentID,
+        getOrdersByCustomerId
+    };
 };
